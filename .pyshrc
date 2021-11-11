@@ -1,0 +1,5 @@
+# planning to allow for the rc file to be interpreted in both Python style and traditional syntax
+# for now, just Python is implemented
+SYNTAX = "python"
+
+PROMPT = "{user}@{host}:{cwd}>> "
