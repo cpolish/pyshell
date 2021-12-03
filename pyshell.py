@@ -2,7 +2,11 @@
 
 import argparse
 import os
+import pysh_builtins
 import pysh_read
+import shlex
+import subprocess
+import sys
 
 
 def load_rc() -> None:
@@ -23,10 +27,32 @@ def check_rc(file):
     return file
 
 
+def get_user_input() -> tuple[str, ...]:
+    prompt = os.getenv("PROMPT").format(**os.environ)
+    user_input = input(prompt)
+    user_input_split = shlex.split(user_input)
+    return tuple(user_input_split)
+
+
 def prompt() -> None:
     while True:
-        user_input = input(os.getenv('PROMPT'))
-        print(user_input)
+        try:
+            user_input_split = get_user_input()
+            user_input_cmd = user_input_split[0]
+            if user_input_cmd == "exit":
+                break
+            elif user_input_cmd in pysh_builtins.BUILTINS:
+                pysh_builtins.run_builtin(user_input_cmd, user_input_split[1:])
+            else:
+                subprocess.run(user_input_split)
+        except (EOFError, KeyboardInterrupt):
+            print()
+        except FileNotFoundError:
+            print(f"pysh: unknown command: {user_input_split[0]}", file=sys.stderr)
+
+
+def setup_env_vars() -> None:
+    os.environ["HOST"] = os.uname()[1]
 
 
 def fetch_args() -> None:
@@ -38,6 +64,7 @@ def fetch_args() -> None:
 
 def main() -> None:
     fetch_args()
+    setup_env_vars()
     load_rc()
     prompt()
 

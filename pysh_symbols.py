@@ -9,19 +9,20 @@ Equivalent to other shell's reserved symbols for features such as:
 etc.
 """
 import os
+from typing import Callable
 
 
 # User variables
 USER = {
-    "{cwd}": "{os.getenv('PWD')}",
-    "{user}": "{os.getenv('USER')}",
-    "{~}": "{os.getenv('HOME')}",
-    "{home}": "{os.getenv('HOME')}"
+    "{cwd}": "{PWD}",
+    "{user}": "{USER}",
+    "{~}": "{HOME}",
+    "{home}": "{HOME}"
 }
 
 # System variables
 SYS = {
-    "{host}": "{os.uname()[1]}"
+    "{host}": "{HOST}"
 }
 
 VARS = USER | SYS
@@ -31,5 +32,4 @@ def interpet_symbols(text: str) -> str:
     for key, val in VARS.items():
         if key in text:
             text = text.replace(key, val)
-    f_text = eval(f"f\"{text}\"")
-    return f_text
+    return text
