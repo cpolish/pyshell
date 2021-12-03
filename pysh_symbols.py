@@ -8,18 +8,28 @@ Equivalent to other shell's reserved symbols for features such as:
 
 etc.
 """
-
 import os
+
 
 # User variables
 USER = {
-    r"{cwd}": os.getenv("PWD"),
-    r"{user}": os.getenv("USER"),
-    r"{~}": os.getenv("HOME"),
-    r"{home}": os.getenv("HOME")
+    "{cwd}": "{os.getenv('PWD')}",
+    "{user}": "{os.getenv('USER')}",
+    "{~}": "{os.getenv('HOME')}",
+    "{home}": "{os.getenv('HOME')}"
 }
 
 # System variables
 SYS = {
-    r"{host}": os.getenv("HOST")
+    "{host}": "{os.uname()[1]}"
 }
+
+VARS = USER | SYS
+
+
+def interpet_symbols(text: str) -> str:
+    for key, val in VARS.items():
+        if key in text:
+            text = text.replace(key, val)
+    f_text = eval(f"f\"{text}\"")
+    return f_text
